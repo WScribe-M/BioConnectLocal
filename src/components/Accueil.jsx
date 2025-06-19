@@ -13,6 +13,10 @@ const Accueil = ({ navigation }) => {
         title="Afficher les données"
         onPress={() => navigation.navigate('AffichageDonnees')}
       />
+        <Button
+            title="Favoris"
+            onPress={() => navigation.navigate('FavorisScreen')}
+        />
     </View>
   );
 };

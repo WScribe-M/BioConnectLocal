@@ -13,6 +13,7 @@ import ApiPage from './src/components/ApiPage';
 import AffichageDonnees from './src/components/AffichageDonnees';
 import { initDatabase, closeDatabase } from './src/services/migrations/index.js';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import FavorisScreen from "./src/components/FavorisScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,7 @@ function App() {
         />
         <Stack.Screen name="ApiPage" component={ApiPage} options={{ title: 'Page API' }} />
         <Stack.Screen name="AffichageDonnees" component={AffichageDonnees} options={{ title: 'Données internes' }} />
+        <Stack.Screen name="FavorisScreen" component={FavorisScreen} options={{ title: 'Mes Favoris' }} />
 
       </Stack.Navigator>
     </NavigationContainer>
