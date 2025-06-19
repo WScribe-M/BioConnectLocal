@@ -1,74 +1,96 @@
-import {Button, Linking, StyleSheet, Text, View} from "react-native";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const OperatorDetails = () => {
+export default function ProducteurScreen({ route, navigation }) {
+    const { producteur } = route.params;
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Nom de l'opérateur</Text>
-            <Text style={styles.text}>Adresse: Adresse de l'opérateur</Text>
-            <Text style={styles.text}>SIRET: Numéro de SIRET</Text>
-            <Text style={styles.text}>Activités: Activités de l'opérateur (Production, Préparation, etc.)</Text>
-            <Text style={styles.text}>Produit listés:</Text>
-            <View style={styles.itemContainer}>
-                <View>
-                    <Text style={styles.itemTitle}>Produit 1</Text>
-                    <Text style={styles.itemDescription}>Description du produit 1</Text>
-                </View>
-                <Ionicons name="star-outline" size={25} color="#2196f3" />
+        <ScrollView style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Ionicons name="leaf" size={32} color="#fff" />
+                <Text style={styles.headerTitle}>{producteur.nom}</Text>
             </View>
-            <View style={styles.itemContainer}>
-                <View>
-                    <Text style={styles.itemTitle}>Produit 2</Text>
-                    <Text style={styles.itemDescription}>Description du produit 2</Text>
+
+            <View style={styles.content}>
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>📍 Adresse :</Text>
+                    <Text style={styles.cardContent}>{producteur.adresse}</Text>
                 </View>
-                <Ionicons name="star-outline" size={25} color="#2196f3" />
+
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>🆔 Identifiant :</Text>
+                    <Text style={styles.cardContent}>{producteur.operator_id}</Text>
+                </View>
+
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>🥕 Produits proposés :</Text>
+                    <Text style={styles.cardContent}>Fruits et légumes bio, produits frais, produits d'épicerie...</Text>
+                </View>
+
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>🕑 Horaires :</Text>
+                    <Text style={styles.cardContent}>Du lundi au vendredi : 9h - 18h</Text>
+                    <Text style={styles.cardContent}>Samedi : 10h - 16h</Text>
+                    <Text style={styles.cardContent}>Dimanche : Fermé</Text>
+                </View>
             </View>
-            <Text style={styles.text}>Numéro Bio</Text>
-            <Button
-                title="Site web de l'opérateur"
-                onPress={() => Linking.openURL('https://google.com')}
-            />
-            <Button
-                title="Téléphoner à l'opérateur"
-                onPress={() => Linking.openURL('tel:0123456789')}
-            />
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#F5FCFF',
+        backgroundColor: '#f0f7f4',
     },
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    text: {
-        fontSize: 16,
-        marginTop: 15,
-        marginBottom: 10,
-    },
-    itemContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    header: {
+        backgroundColor: '#4caf50',
+        paddingTop: 50,
+        paddingBottom: 20,
         alignItems: 'center',
-        backgroundColor: '#eaeaea',
-        padding: 10,
-        marginVertical: 5,
-        borderRadius: 5,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        borderBottomLeftRadius: 25,
+        borderBottomRightRadius: 25,
     },
-    itemTitle: {
+    backButton: {
+        position: 'absolute',
+        left: 20,
+        top: 55,
+    },
+    headerTitle: {
+        color: '#fff',
+        fontSize: 26,
+        fontWeight: 'bold',
+        marginLeft: 10,
+    },
+    content: {
+        padding: 20,
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        padding: 15,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 5,
+        elevation: 4,
+    },
+    cardTitle: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 5,
     },
-    itemDescription: {
-        fontSize: 14,
+    cardContent: {
+        fontSize: 15,
         color: '#555',
-    }
-})
-
-export default OperatorDetails;
+        marginLeft: 10,
+    },
+});
