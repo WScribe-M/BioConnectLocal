@@ -8,6 +8,24 @@ export default function OperatorDetails({ route, navigation }) {
 
     console.log(operateur);
 
+    const operateurMapped = {
+        name: operateur.name || operateur.nom,
+        address: operateur.address || operateur.lieu || '',
+        ville: operateur.ville || '',
+        siret: operateur.siret || '',
+        produits: operateur.produits || [],
+        activites: operateur.activites || operateur.productions || [],
+        telephone: operateur.telephone || '',
+        siteWeb: operateur.siteWeb || '',
+        numeroBio: operateur.numeroBio || '',
+        id: operateur.id || operateur.operator_id || '',
+        operator_id: operateur.operator_id || operateur.id || '',
+    };
+
+    const fullAddress = [operateurMapped.address, operateurMapped.ville]
+        .filter(Boolean)
+        .join(', ');
+
     const db = SQLite.openDatabase({ name: 'Favoris2.db', location: 'default' });
     const removeFromFavorites = () => {
         db.transaction(tx => {
@@ -15,7 +33,7 @@ export default function OperatorDetails({ route, navigation }) {
                 'DELETE FROM producers WHERE id = ?',
                 [operateur.id],
                 (_, result) => {
-                    Alert.alert('Retiré des favoris', `"${operateur.name}" a bien été retiré.`);
+                    Alert.alert('Retiré des favoris', `"${operateurMapped.name}" a bien été retiré.`);
                     navigation.goBack();
                 },
                 (_, error) => {
@@ -31,27 +49,40 @@ export default function OperatorDetails({ route, navigation }) {
             tx.executeSql(
                 `INSERT INTO producers (operator_id, name, address, siret, activites, produits, numeroBio, telephone, siteWeb, favori) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    operateur.id, operateur.name, operateur.address, operateur.siret, operateur.activites, operateur.produits, operateur.numeroBio, operateur.telephone, operateur.siteWeb, 1
+                    operateurMapped.operator_id || operateur.id,
+                    operateurMapped.name || operateurMapped.nom,
+                    fullAddress,
+                    operateurMapped.siret,
+                    operateurMapped.productions,
+                    JSON.stringify(operateurMapped.produits || []),
+                    operateurMapped.numeroBio,
+                    operateurMapped.telephone,
+                    operateurMapped.siteWeb,
+                    1
                 ],
-                () => console.log('✅ Producteur inséré'),
+                () => {
+                    console.log('✅ Producteur inséré');
+                    Alert.alert('Ajouté aux favoris', `"${operateurMapped.name}" a bien été ajouté à vos favoris ✅`);
+                    navigation.goBack();
+                },
                 (_, err) => { console.error('❌ Erreur INSERT producteur', err); return false; }
             );
         });
     }
 
     const confirmDelete = () => {
-        Alert.alert('Confirmer', `Supprimer "${operateur.name}" ?`, [
+        Alert.alert('Confirmer', `Supprimer "${operateurMapped.name}" ?`, [
             { text: 'Annuler', style: 'cancel' },
             { text: 'Supprimer', style: 'destructive', onPress: () => removeFromFavorites() },
         ]);
     };
 
     const callOperator = () => {
-        Linking.openURL(`tel:${operateur.telephone}`).catch(err => Alert.alert('Erreur', 'Impossible de passer l’appel'));
+        Linking.openURL(`tel:${operateurMapped.telephone}`).catch(err => Alert.alert('Erreur', 'Impossible de passer l’appel'));
     };
 
     const visitWebsite = () => {
-        Linking.openURL(operateur.siteWeb).catch(err => Alert.alert('Erreur', 'Impossible d’ouvrir le site'));
+        Linking.openURL(operateurMapped.siteWeb).catch(err => Alert.alert('Erreur', 'Impossible d’ouvrir le site'));
     };
 
     return (
@@ -59,23 +90,22 @@ export default function OperatorDetails({ route, navigation }) {
             <StatusBar barStyle="light-content" backgroundColor="#4caf50" />
             <View style={styles.bandeau}>
                 <Ionicons name="leaf" size={30} color="#fff" />
-                <Text style={styles.bandeauTitle}>{operateur.nom}</Text>
+                <Text style={styles.bandeauTitle}>{operateurMapped.name}</Text>
             </View>
             <View style={{ padding: 20 }}>
-                {/*<Text style={styles.header}>{operateur.name}</Text>*/}
 
                 <View style={styles.card}>
                     <Text style={styles.label}>📍 Adresse</Text>
-                    <Text style={styles.content}>{operateur.ville}, {operateur.lieu} - {operateur.codePostal}</Text>
+                    <Text style={styles.content}>{fullAddress}</Text>
 
                     <Text style={styles.label}>SIRET</Text>
-                    <Text style={styles.content}>{operateur.siret}</Text>
+                    <Text style={styles.content}>{operateurMapped.siret}</Text>
 
                     <Text style={styles.label}>🍃 Activités</Text>
 {/*                     {operateur.activites.map((act, index) => ( */}
 {/*                         <Text key={index} style={styles.content}>- {act}</Text> */}
 {/*                     ))} */}
-                    <Text>{operateur.productions}</Text>
+                    <Text>{operateurMapped.productions}</Text>
 
                     <Text style={styles.label}>🛒 Produits</Text>
 {/*                     {operateur.produits.map((prod, index) => ( */}
@@ -83,7 +113,7 @@ export default function OperatorDetails({ route, navigation }) {
 {/*                     ))} */}
 
                     <Text style={styles.label}>🌿 Numéro Bio</Text>
-                    <Text style={styles.content}>{operateur.numeroBio}</Text>
+                    <Text style={styles.content}>{operateurMapped.numeroBio}</Text>
                 </View>
 
                 <View style={styles.actions}>
