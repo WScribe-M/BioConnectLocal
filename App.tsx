@@ -46,7 +46,7 @@ function App() {
         />
         <Stack.Screen name="ApiPage" component={ApiPage} options={{ title: 'Page API' }} />
         <Stack.Screen name="AffichageDonnees" component={AffichageDonnees} options={{ title: 'Données internes' }} />
-        <Stack.Screen name="OperatorDetails" component={OperatorDetails} options={{ title: 'Operator Details' }} />
+        <Stack.Screen name="OperatorDetails" component={OperatorDetails} options={{ title: 'Details du producteur', headerBackTitle: 'Retour' }} />
         <Stack.Screen name="FavorisScreen" component={FavorisScreen} options={{ title: 'Mes Favoris' }} />
 
       </Stack.Navigator>
