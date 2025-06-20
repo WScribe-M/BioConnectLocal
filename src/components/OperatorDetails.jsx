@@ -6,7 +6,7 @@ import SQLite from "react-native-sqlite-storage";
 export default function OperatorDetails({ route, navigation }) {
     const operateur = route.params.operateur;
 
-    console.log(operateur.favori);
+    console.log(operateur);
 
     const db = SQLite.openDatabase({ name: 'Favoris.db', location: 'default' });
     const removeFromFavorites = () => {
@@ -52,27 +52,28 @@ export default function OperatorDetails({ route, navigation }) {
             <StatusBar barStyle="light-content" backgroundColor="#4caf50" />
             <View style={styles.bandeau}>
                 <Ionicons name="leaf" size={30} color="#fff" />
-                <Text style={styles.bandeauTitle}>{operateur.name}</Text>
+                <Text style={styles.bandeauTitle}>{operateur.nom}</Text>
             </View>
             <View style={{ padding: 20 }}>
                 {/*<Text style={styles.header}>{operateur.name}</Text>*/}
 
                 <View style={styles.card}>
                     <Text style={styles.label}>📍 Adresse</Text>
-                    <Text style={styles.content}>{operateur.address}</Text>
+                    <Text style={styles.content}>{operateur.ville}, {operateur.lieu} - {operateur.codePostal}</Text>
 
                     <Text style={styles.label}>SIRET</Text>
                     <Text style={styles.content}>{operateur.siret}</Text>
 
                     <Text style={styles.label}>🍃 Activités</Text>
-                    {operateur.activites.map((act, index) => (
-                        <Text key={index} style={styles.content}>- {act}</Text>
-                    ))}
+{/*                     {operateur.activites.map((act, index) => ( */}
+{/*                         <Text key={index} style={styles.content}>- {act}</Text> */}
+{/*                     ))} */}
+                    <Text>{operateur.productions}</Text>
 
                     <Text style={styles.label}>🛒 Produits</Text>
-                    {operateur.produits.map((prod, index) => (
-                        <Text key={index} style={styles.content}>- {prod}</Text>
-                    ))}
+{/*                     {operateur.produits.map((prod, index) => ( */}
+{/*                         <Text key={index} style={styles.content}>- {prod}</Text> */}
+{/*                     ))} */}
 
                     <Text style={styles.label}>🌿 Numéro Bio</Text>
                     <Text style={styles.content}>{operateur.numeroBio}</Text>

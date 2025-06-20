@@ -21,8 +21,6 @@ const Map = ({ markers }) => {
           lat: addr.lat,
           lng: addr.long,
       },
-     //title: addr.ville,
-     //description: addr.codePostal,
     }));
 
   console.log('leafletMarkers:', leafletMarkers);

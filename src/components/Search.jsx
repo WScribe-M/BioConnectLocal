@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   TextInput,
   SafeAreaView,
   ScrollView,
@@ -12,11 +11,16 @@ import {
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Map from './Map';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const Search = () => {
   const [addresses, setAddresses] = useState([]);
   const [search, setSearch] = useState('');
   const [filteredAddresses, setFilteredAddresses] = useState([]);
+  const [sortByExperience, setSortByExperience] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,10 +33,17 @@ const Search = () => {
             id: addr.id,
             ville: addr.ville || '',
             codePostal: addr.codePostal || '',
+            lieu: addr.lieu || '',
+            siret: item.siret || '',
+            numeroBio: item.numeroBio || '',
             lat: addr.lat,
             long: addr.long,
+            nom: item.denominationcourante || item.raisonSociale || 'Sans nom',
+            dateEngagement: item.certificats?.[0]?.dateEngagement || null,
+            productions: (item.productions || []).map(prod => prod.nom),
           }))
         ) || [];
+
 
         setAddresses(data);
       } catch (error) {
@@ -44,16 +55,25 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    if (search.trim() === '') {
-      setFilteredAddresses([]);
-    } else {
-      const filtered = addresses.filter(addr =>
+    let results = [];
+
+    if (search.trim() !== '') {
+      results = addresses.filter(addr =>
         addr.ville.toLowerCase().startsWith(search.toLowerCase()) ||
         addr.codePostal.startsWith(search)
       );
-      setFilteredAddresses(filtered);
     }
-  }, [search, addresses]);
+
+    if (sortByExperience) {
+      results.sort((a, b) => {
+        const dateA = new Date(a.dateEngagement || '1900-01-01');
+        const dateB = new Date(b.dateEngagement || '1900-01-01');
+        return dateB - dateA;
+      });
+    }
+
+    setFilteredAddresses(results);
+  }, [search, addresses, sortByExperience]);
 
   return (
     <SafeAreaProvider>
@@ -66,26 +86,43 @@ const Search = () => {
           placeholderTextColor="#888"
         />
 
-        {/* Affiche la liste uniquement si une recherche est en cours */}
         {search.trim() !== '' && (
-          <View style={styles.listContainer}>
-            <ScrollView style={styles.scrollList}>
-              {filteredAddresses.length > 0 ? (
-                filteredAddresses.map(addr => (
+          <TouchableOpacity
+            onPress={() => setSortByExperience(!sortByExperience)}
+            style={styles.sortButton}
+          >
+            <Text style={styles.sortButtonText}>
+              {sortByExperience ? '🔽 Annuler tri' : '⭐ Trier par expérience Bio'}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {search.trim() !== '' && (
+          <ScrollView style={styles.cardList}>
+            {filteredAddresses.length > 0 ? (
+              filteredAddresses.map(addr => (
+                <View key={addr.id} style={styles.card}>
+                  <Text style={styles.cardTitle}>{addr.nom}</Text>
+                  <Text style={styles.cardLocation}>
+                    📍 {addr.ville} ({addr.codePostal})
+                  </Text>
+                  {addr.dateEngagement && (
+                    <Text style={styles.cardDate}>
+                      🕒 Engagé bio depuis : {new Date(addr.dateEngagement).toLocaleDateString()}
+                    </Text>
+                  )}
                   <TouchableOpacity
-                    key={addr.id}
-                    style={styles.operatorItem}
-                    onPress={() => Alert.alert('Sélection', `${addr.ville} (${addr.codePostal})`)}
+                    style={styles.cardButton}
+                    onPress={() => navigation.navigate('OperatorDetails', { operateur: addr })}
                   >
-                    <Text style={styles.cityText}>{addr.ville}</Text>
-                    <Text style={styles.postalText}>{addr.codePostal}</Text>
+                    <Text style={styles.cardButtonText} >Voir plus</Text>
                   </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noResults}>Aucun résultat trouvé</Text>
-              )}
-            </ScrollView>
-          </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noResults}>Aucun résultat trouvé</Text>
+            )}
+          </ScrollView>
         )}
 
         <View style={styles.mapContainer}>
@@ -111,37 +148,64 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     fontSize: 16,
   },
-  listContainer: {
+  sortButton: {
+    backgroundColor: '#e0f0ff',
+    alignSelf: 'flex-start',
     marginHorizontal: 12,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  sortButtonText: {
+    color: '#007acc',
+    fontWeight: 'bold',
+  },
+  cardList: {
+    marginHorizontal: 12,
+    maxHeight: 300,
+  },
+  card: {
+    backgroundColor: '#fdfdfd',
     borderRadius: 12,
-    padding: 8,
+    padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
-    elevation: 4,
-    maxHeight: 220,
-  },
-  scrollList: {
-    paddingHorizontal: 4,
-  },
-  operatorItem: {
-    backgroundColor: '#f2f2f2',
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 8,
+    elevation: 2,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#eee',
   },
-  cityText: {
+  cardTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginBottom: 4,
+    color: '#333',
   },
-  postalText: {
+  cardLocation: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 4,
+  },
+  cardDate: {
+    fontSize: 13,
+    color: '#999',
+    marginBottom: 10,
+    fontStyle: 'italic',
+  },
+  cardButton: {
+    backgroundColor: '#007acc',
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+  },
+  cardButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
   noResults: {
     textAlign: 'center',
@@ -151,7 +215,7 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    marginTop: 8,
+    marginTop: 10,
   },
 });
 
