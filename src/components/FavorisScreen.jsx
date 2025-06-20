@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import SQLite from 'react-native-sqlite-storage';
 import {useFocusEffect} from "@react-navigation/native";
 
-const db = SQLite.openDatabase({ name: 'Favoris.db', location: 'default' });
+const db = SQLite.openDatabase({ name: 'Favoris2.db', location: 'default' });
 
 export default function FavorisScreen({ navigation }) {
     const [producers, setProducers] = useState([]);

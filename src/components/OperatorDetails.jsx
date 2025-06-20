@@ -8,7 +8,7 @@ export default function OperatorDetails({ route, navigation }) {
 
     console.log(operateur.favori);
 
-    const db = SQLite.openDatabase({ name: 'Favoris.db', location: 'default' });
+    const db = SQLite.openDatabase({ name: 'Favoris2.db', location: 'default' });
     const removeFromFavorites = () => {
         db.transaction(tx => {
             tx.executeSql(
@@ -27,9 +27,16 @@ export default function OperatorDetails({ route, navigation }) {
     };
 
     const ajouterAuxFavoris = () => {
-        Alert.alert('Coucou', `Test`, [
-            { text: 'Annuler', style: 'cancel' },
-        ]);
+        db.transaction(tx => {
+            tx.executeSql(
+                `INSERT INTO producers (operator_id, name, address, siret, activites, produits, numeroBio, telephone, siteWeb, favori) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    operateur.id, operateur.name, operateur.address, operateur.siret, operateur.activites, operateur.produits, operateur.numeroBio, operateur.telephone, operateur.siteWeb, 1
+                ],
+                () => console.log('✅ Producteur inséré'),
+                (_, err) => { console.error('❌ Erreur INSERT producteur', err); return false; }
+            );
+        });
     }
 
     const confirmDelete = () => {
