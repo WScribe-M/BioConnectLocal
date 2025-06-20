@@ -8,7 +8,7 @@ export default function OperatorDetails({ route, navigation }) {
 
     console.log(operateur);
 
-    const db = SQLite.openDatabase({ name: 'Favoris.db', location: 'default' });
+    const db = SQLite.openDatabase({ name: 'Favoris2.db', location: 'default' });
     const removeFromFavorites = () => {
         db.transaction(tx => {
             tx.executeSql(
@@ -27,9 +27,16 @@ export default function OperatorDetails({ route, navigation }) {
     };
 
     const ajouterAuxFavoris = () => {
-        Alert.alert('Coucou', `Test`, [
-            { text: 'Annuler', style: 'cancel' },
-        ]);
+        db.transaction(tx => {
+            tx.executeSql(
+                `INSERT INTO producers (operator_id, name, address, siret, activites, produits, numeroBio, telephone, siteWeb, favori) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    operateur.id, operateur.name, operateur.address, operateur.siret, operateur.activites, operateur.produits, operateur.numeroBio, operateur.telephone, operateur.siteWeb, 1
+                ],
+                () => console.log('✅ Producteur inséré'),
+                (_, err) => { console.error('❌ Erreur INSERT producteur', err); return false; }
+            );
+        });
     }
 
     const confirmDelete = () => {
@@ -112,13 +119,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f9fbfc',
     },
-    header: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#4caf50',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
     card: {
         backgroundColor: '#fff',
         padding: 20,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     bandeau: {
-        paddingTop: 40,
+        paddingTop: 20,
         paddingBottom: 20,
         backgroundColor: '#4caf50',
         flexDirection: 'row',

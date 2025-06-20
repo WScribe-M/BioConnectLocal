@@ -136,7 +136,7 @@ const Search = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#4caf50',
   },
   input: {
     height: 45,

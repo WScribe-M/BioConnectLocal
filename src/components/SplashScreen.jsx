@@ -9,14 +9,14 @@ const SplashScreen = ({ navigation }) => {
     setTimeout(() => {
       setLoading(false);
       // Naviguez vers la page d'accueil après le délai
-      navigation.replace('Accueil');
+      navigation.replace('MainTabs', { screen: 'Accueil' });
     }, 2000); // Durée du splash screen en millisecondes (2 secondes ici)
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mon App</Text>
-      <ActivityIndicator size="large" color="#0000ff" />
+      <Text style={styles.title}>BioConnect</Text>
+      <ActivityIndicator size="large" color="#4caf50" />
     </View>
   );
 };
