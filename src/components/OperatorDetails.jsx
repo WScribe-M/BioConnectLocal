@@ -111,13 +111,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f9fbfc',
     },
-    header: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#4caf50',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
     card: {
         backgroundColor: '#fff',
         padding: 20,
@@ -177,7 +170,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     bandeau: {
-        paddingTop: 40,
+        paddingTop: 20,
         paddingBottom: 20,
         backgroundColor: '#4caf50',
         flexDirection: 'row',

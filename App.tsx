@@ -1,65 +1,73 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SplashScreen from './src/components/SplashScreen';
 import Accueil from './src/components/Accueil';
-import ApiPage from './src/components/ApiPage';
-import AffichageDonnees from './src/components/AffichageDonnees';
+import FavorisScreen from './src/components/FavorisScreen';
 import Search from './src/components/Search';
+import OperatorDetails from './src/components/OperatorDetails';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { initDatabase, closeDatabase } from './src/services/migrations/index.js';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import FavorisScreen from "./src/components/FavorisScreen";
-import OperatorDetails from "./src/components/OperatorDetails";
-
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function TabNavigator() {
+  return (
+      <Tab.Navigator
+          screenOptions={({ route }) => ({
+            headerShown: false, // Les tabs n'ont pas de header, le stack s'en charge
+            tabBarActiveTintColor: '#fff',
+            tabBarInactiveTintColor: '#e0e0e0',
+            tabBarStyle: {
+              backgroundColor: '#4caf50',
+              height: 90,
+              paddingTop: 10,
+            },
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'Accueil') iconName = focused ? 'home' : 'home-outline';
+              else if (route.name === 'FavorisScreen') iconName = focused ? 'star' : 'star-outline';
+              else if (route.name === 'Search') iconName = focused ? 'search' : 'search-outline';
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          })}
+      >
+        <Tab.Screen name="Accueil" component={Accueil} options={{ title: 'Accueil' }} />
+        <Tab.Screen name="Search" component={Search} options={{ title: 'Recherche' }} />
+        <Tab.Screen name="FavorisScreen" component={FavorisScreen} options={{ title: 'Favoris' }} />
+      </Tab.Navigator>
+  );
+}
 
 function App() {
   useEffect(() => {
-    // Ouvrir la base de données au montage de l'application
     initDatabase()
-      .then(() => console.log('Database initialized successfully.'))
-      .catch(error => console.error('Failed to initialize database:', error));
+        .then(() => console.log('Database initialized successfully.'))
+        .catch(error => console.error('Failed to initialize database:', error));
 
-    // Fermer la base de données à la fin de vie de l'application (optionnel, mais bonne pratique)
-    return () => {
-      closeDatabase();
-    };
-  }, []); // Le tableau vide assure que cela ne s'exécute qu'une fois
+    return () => { closeDatabase(); };
+  }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen
-          name="Splash"
-          component={SplashScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Accueil"
-          component={Accueil}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen name="ApiPage" component={ApiPage} options={{ title: 'Page API' }} />
-        <Stack.Screen name="AffichageDonnees" component={AffichageDonnees} options={{ title: 'Données internes' }} />
-        <Stack.Screen name="OperatorDetails" component={OperatorDetails} options={{ title: 'Details du producteur', headerBackTitle: 'Retour' }} />
-        <Stack.Screen name="FavorisScreen" component={FavorisScreen} options={{ title: 'Mes Favoris' }} />
-
-        <Stack.Screen
-            name="Search"
-            component={Search}
-            options={{ title: 'Page de recherche'}}
-        />
-
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Splash">
+          <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+          {/* Met la TabBar après Splash */}
+          <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
+          <Stack.Screen
+              name="OperatorDetails"
+              component={OperatorDetails}
+              options={{
+                title: 'Détails du producteur',
+                headerBackTitle: 'Retour',
+                headerStyle: { backgroundColor: '#4caf50' },
+                headerTintColor: '#fff'
+              }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
 
