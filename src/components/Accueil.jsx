@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 const Accueil = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenue sur l'Accueil !</Text>
+      <Text style={styles.title}>Hello World !</Text>
       <Button
         title="Aller à la page API"
         onPress={() => navigation.navigate('ApiPage')}
@@ -13,10 +13,14 @@ const Accueil = ({ navigation }) => {
         title="Afficher les données"
         onPress={() => navigation.navigate('AffichageDonnees')}
       />
-        <Button
-            title="Favoris"
-            onPress={() => navigation.navigate('FavorisScreen')}
-        />
+      <Button
+          title="Favoris"
+          onPress={() => navigation.navigate('FavorisScreen')}
+      />
+      <Button
+        title="Rechercher"
+        onPress={() => navigation.navigate('Search')}
+      />
     </View>
   );
 };
