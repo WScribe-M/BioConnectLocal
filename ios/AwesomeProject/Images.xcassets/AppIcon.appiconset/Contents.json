@@ -31,16 +31,19 @@
       "size" : "40x40"
     },
     {
+      "filename" : "BioConnect 120x120.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
+      "filename" : "BioConnect 180x180.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
+      "filename" : "BIoConnectIcon avec arrière-plan supprimé.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"

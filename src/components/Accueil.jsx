@@ -14,9 +14,13 @@ const Accueil = ({ navigation }) => {
         onPress={() => navigation.navigate('AffichageDonnees')}
       />
       <Button
-          title="Rechercher"
-          onPress={() => navigation.navigate('Search')}
-        />
+          title="Favoris"
+          onPress={() => navigation.navigate('FavorisScreen')}
+      />
+      <Button
+        title="Rechercher"
+        onPress={() => navigation.navigate('Search')}
+      />
     </View>
   );
 };
