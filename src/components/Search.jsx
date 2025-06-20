@@ -1,94 +1,158 @@
-import { View, Text, StyleSheet, ActivityIndicator, TextInput,  SafeAreaView, Button} from 'react-native';
-import Map from './Map';
 import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Alert
+} from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Map from './Map';
 
 const Search = () => {
-    const [addresses, setAddresses] = useState([]);
-    const [search, setSearch] = useState('');
+  const [addresses, setAddresses] = useState([]);
+  const [search, setSearch] = useState('');
+  const [filteredAddresses, setFilteredAddresses] = useState([]);
 
-     useEffect(() => {
-       const fetchData = async () => {
-         try {
-           const res = await fetch('https://opendata.agencebio.org/api/gouv/operateurs/');
-           const json = await res.json();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('https://opendata.agencebio.org/api/gouv/operateurs/');
+        const json = await res.json();
 
-           // Extraction des adresses depuis chaque item
-           const data = json.items?.flatMap(item =>
-             (item.adressesOperateurs || []).map(addr => ({
-               id: addr.id,
-               ville: addr.ville,
-               codePostal: addr.codePostal,
-               lat: addr.lat,
-               long: addr.long,
-             }))
-           ) || [];
+        const data = json.items?.flatMap(item =>
+          (item.adressesOperateurs || []).map(addr => ({
+            id: addr.id,
+            ville: addr.ville || '',
+            codePostal: addr.codePostal || '',
+            lat: addr.lat,
+            long: addr.long,
+          }))
+        ) || [];
 
-           console.log('Données transformées pour la carte :', data);
-           setAddresses(data);
+        setAddresses(data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données :', error);
+      }
+    };
 
-         } catch (error) {
-           console.error('Erreur lors de la récupération des données :', error);
-         }
-       };
+    fetchData();
+  }, []);
 
-       fetchData();
-     }, []);
-//console.log('Adresse unique pour test :', addresses);
+  useEffect(() => {
+    if (search.trim() === '') {
+      setFilteredAddresses([]);
+    } else {
+      const filtered = addresses.filter(addr =>
+        addr.ville.toLowerCase().startsWith(search.toLowerCase()) ||
+        addr.codePostal.startsWith(search)
+      );
+      setFilteredAddresses(filtered);
+    }
+  }, [search, addresses]);
 
-    return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
-                <View>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={setSearch}
-                        value={search}
-                        placeholder="Entrer un code Postal ou une ville"
-                    />
-                </View>
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <TextInput
+          style={styles.input}
+          onChangeText={setSearch}
+          value={search}
+          placeholder="🔍 Entrez une ville ou un code postal"
+          placeholderTextColor="#888"
+        />
 
-               {addresses.length > 0 ? (
-                 <View style={styles.mapContainer}>
-                   <Map markers={addresses} />
-                 </View>
-               ) : (
-                 <View style={styles.loaderContainer}>
-                   <ActivityIndicator size="large" color="#0000ff" />
-                   <Text>Chargement de la carte...</Text>
-                 </View>
-               )}
+        {/* Affiche la liste uniquement si une recherche est en cours */}
+        {search.trim() !== '' && (
+          <View style={styles.listContainer}>
+            <ScrollView style={styles.scrollList}>
+              {filteredAddresses.length > 0 ? (
+                filteredAddresses.map(addr => (
+                  <TouchableOpacity
+                    key={addr.id}
+                    style={styles.operatorItem}
+                    onPress={() => Alert.alert('Sélection', `${addr.ville} (${addr.codePostal})`)}
+                  >
+                    <Text style={styles.cityText}>{addr.ville}</Text>
+                    <Text style={styles.postalText}>{addr.codePostal}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.noResults}>Aucun résultat trouvé</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
 
-
-            </SafeAreaView>
-        </SafeAreaProvider>
-
-
-    )
-
-}
+        <View style={styles.mapContainer}>
+          <Map markers={search.trim() !== '' ? filteredAddresses : addresses} />
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    mapContainer: {
-        flex: 1,
-    },
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
-    loaderContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  input: {
+    height: 45,
+    margin: 12,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+    fontSize: 16,
+  },
+  listContainer: {
+    marginHorizontal: 12,
+    marginBottom: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
+    maxHeight: 220,
+  },
+  scrollList: {
+    paddingHorizontal: 4,
+  },
+  operatorItem: {
+    backgroundColor: '#f2f2f2',
+    padding: 12,
+    marginBottom: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  cityText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  postalText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  noResults: {
+    textAlign: 'center',
+    color: '#aaa',
+    paddingVertical: 12,
+    fontStyle: 'italic',
+  },
+  mapContainer: {
+    flex: 1,
+    marginTop: 8,
+  },
 });
-
-
 
 export default Search;
